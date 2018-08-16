@@ -7,9 +7,7 @@ import classNames from 'classnames';
 import EventListener from 'react-event-listener';
 import debounce from 'debounce'; // < 1kb payload overhead when lodash/debounce is > 3kb.
 import { getNormalizedScrollLeft, detectScrollType } from 'normalize-scroll-left';
-// TODO: should we fork it?
-// https://github.com/michaelrhodes/scroll/issues/10
-import scroll from 'scroll';
+import animate from '../internal/animate';
 import ScrollbarSize from './ScrollbarSize';
 import withStyles from '../styles/withStyles';
 import TabIndicator from './TabIndicator';
@@ -199,7 +197,7 @@ class Tabs extends React.Component {
     const nextScrollLeft = this.tabsRef.scrollLeft + delta * multiplier;
     // Fix for Edge
     const invert = theme.direction === 'rtl' && detectScrollType() === 'reverse' ? -1 : 1;
-    scroll.left(this.tabsRef, invert * nextScrollLeft);
+    this.scroll(invert * nextScrollLeft);
   };
 
   scrollSelectedIntoView = () => {
@@ -213,12 +211,16 @@ class Tabs extends React.Component {
     if (tabMeta.left < tabsMeta.left) {
       // left side of button is out of view
       const nextScrollLeft = tabsMeta.scrollLeft + (tabMeta.left - tabsMeta.left);
-      scroll.left(this.tabsRef, nextScrollLeft);
+      this.scroll(nextScrollLeft);
     } else if (tabMeta.right > tabsMeta.right) {
       // right side of button is out of view
       const nextScrollLeft = tabsMeta.scrollLeft + (tabMeta.right - tabsMeta.right);
-      scroll.left(this.tabsRef, nextScrollLeft);
+      this.scroll(nextScrollLeft);
     }
+  };
+
+  scroll = value => {
+    animate('scrollLeft', this.tabsRef, value);
   };
 
   updateScrollButtonState = () => {
@@ -254,13 +256,13 @@ class Tabs extends React.Component {
         theme.direction === 'rtl'
           ? tabsMeta.scrollLeftNormalized + tabsMeta.clientWidth - tabsMeta.scrollWidth
           : tabsMeta.scrollLeft;
-      left = tabMeta.left - tabsMeta.left + correction;
+      left = Math.round(tabMeta.left - tabsMeta.left + correction);
     }
 
     const indicatorStyle = {
       left,
       // May be wrong until the font is loaded.
-      width: tabMeta ? tabMeta.width : 0,
+      width: tabMeta ? Math.round(tabMeta.width) : 0,
     };
 
     if (

@@ -39,6 +39,7 @@ export const styles = theme => ({
   },
   /* Styles applied to the span element that wraps the children. */
   label: {
+    width: '100%', // assure the correct width for iOS Safari
     display: 'inherit',
     alignItems: 'inherit',
     justifyContent: 'inherit',
@@ -106,7 +107,7 @@ export const styles = theme => ({
       },
     },
   },
-  /* Styles applied to the root element if `variant="[contained | fab|"` and `color="primary"`. */
+  /* Styles applied to the root element if `variant="[contained | fab]"` and `color="primary"`. */
   containedPrimary: {
     color: theme.palette.primary.contrastText,
     backgroundColor: theme.palette.primary.main,
